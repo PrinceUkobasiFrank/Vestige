@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VESTIGE — Artifact Presentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/vestige.css">
+    <style>
+        /* Inline: loading screen only (must exist before JS runs) */
+        .loading {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: #0F0F0D;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1.2s ease, visibility 1.2s ease;
+        }
+        .loading.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .loading-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            font-size: 0.9rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.25);
+            animation: breathe 3s ease-in-out infinite;
+        }
+        @keyframes breathe {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+    <base target="_blank">
+</head>
+<body>
+<!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <span class="loading-text">Preparing the witness</span>
+    </div>
+
+    <!-- Vignette -->
+    <div class="vignette"></div>
+
+    <!-- Testimony -->
+    <div class="testimony-container" id="testimony"></div>
+
+    <!-- Identity Panel -->
+    <div class="identity-panel">
+        <div class="identity-content">
+            <h1 class="artifact-title fade-in-up" id="title" style="transition-delay: 0s">Triceratops Horridus</h1>
+            <div class="identity-details">
+                <div class="detail-group fade-in-up" style="transition-delay: 0.07s">
+                    <span class="detail-label">Period</span>
+                    <span class="detail-value" id="detail-period">Late Cretaceous, 68–66 MYA</span>
+                </div>
+                <div class="detail-group fade-in-up" style="transition-delay: 0.14s">
+                    <span class="detail-label">Location</span>
+                    <span class="detail-value" id="detail-location">Hell Creek Formation, Montana</span>
+                </div>
+                <div class="detail-group fade-in-up" style="transition-delay: 0.21s">
+                    <span class="detail-label">Discovery</span>
+                    <span class="detail-value" id="detail-discovery">1887, by John Bell Hatcher</span>
+                </div>
+                <div class="detail-group fade-in-up" style="transition-delay: 0.28s">
+                    <span class="detail-label">Material</span>
+                    <span class="detail-value" id="detail-material">Fossilized bone, mineralized tissue</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Playback Controls -->
+    <div class="playback-anchor" id="playback-anchor">
+        <div class="playback-bar" id="playback-bar">
+            <div style="position: relative;">
+                <button class="playback-btn" id="btn-prev" title="Previous artifact">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="19,20 9,12 19,4 19,20"></polygon>
+                        <line x1="5" y1="19" x2="5" y2="5"></line>
+                    </svg>
+                    <span class="key-hint">←</span>
+                </button>
+            </div>
+            <div style="position: relative;">
+                <button class="playback-btn primary" id="btn-play-pause" title="Play / Pause">
+                    <svg id="icon-play" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                        <polygon points="5,3 19,12 5,21 5,3"></polygon>
+                    </svg>
+                    <svg id="icon-pause" viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="6" y="4" width="4" height="16"></rect>
+                        <rect x="14" y="4" width="4" height="16"></rect>
+                    </svg>
+                    <span class="key-hint">Space</span>
+                </button>
+            </div>
+            <div style="position: relative;">
+                <button class="playback-btn" id="btn-next" title="Next artifact">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="5,4 15,12 5,20 5,4"></polygon>
+                        <line x1="19" y1="5" x2="19" y2="19"></line>
+                    </svg>
+                    <span class="key-hint">→</span>
+                </button>
+            </div>
+            <div class="playback-divider"></div>
+            <div style="position: relative;">
+                <button class="playback-btn" id="btn-restart" title="Restart current">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="1,4 1,10 7,10"></polyline>
+                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                    </svg>
+                    <span class="key-hint">R</span>
+                </button>
+            </div>
+            <div class="playback-progress">
+                <div class="playback-progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+        <button class="playback-trigger" id="playback-trigger" title="Show controls">
+            <span class="pause-indicator"></span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+        </button>
+        <div class="playback-hint">Auto-hides in 3s</div>
+    </div>
+
+    <!-- 3D Canvas -->
+    <div id="canvas-container"></div>
+
+    <!-- 3D Canvas -->
+    <div id="canvas-container"></div>
+
+    <script type="module" src="assets/js/main.js"></script>
+</body>
+</html>
