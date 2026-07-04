@@ -46,7 +46,7 @@ Every artifact is treated as a living exhibit rather than a static display. Thro
 
 ## Project Structure
 
-Vestige/ │ ├── artifacts/ |    triceratops.glb ├── index.html └── README.md
+Vestige/ │ ├── artifacts/ |    triceratops.glb | terracotta.glb | rosetta.glb | three_benin.glb | voyager-1.glb ├── index.html ├──vestige.html └── README.md
 
 ---
 
